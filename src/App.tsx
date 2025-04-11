@@ -12,6 +12,13 @@ import { VolunteerPositionsPage } from './pages/VolunteerPositionsPage';
 import { AssignVolunteersPage } from './pages/AssignVolunteersPage';
 import { CheckInPage } from './pages/CheckInPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import React, { useState } from 'react';
+import Papa from 'papaparse';
+import { FileUpload } from './components/FileUpload';
+import { DataTable } from './components/DataTable';
+import { SaveToSupabase } from './components/SaveToSupabase';
+import { RawSignUpData, StructuredSignUpData } from './types';
+import { FileSpreadsheet } from 'lucide-react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,6 +54,80 @@ function App() {
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
+  );
+  const [data, setData] = useState<StructuredSignUpData[]>([]);
+
+  const handleFileUpload = (file: File) => {
+    Papa.parse(file, {
+      header: true,
+      complete: (results) => {
+        const rawData = results.data as RawSignUpData[];
+        
+        // Transform the raw data into structured data
+        const structuredData = rawData.map((item, index) => {
+          // Extract date and time parts
+          const startDateTime = item['Start Date/Time'] || '';
+          const [startDate = '', startTime = ''] = startDateTime.split(' ');
+          const [endDate = '', endTime = ''] = (item['End Date/Time'] || '').split(' ');
+          
+          // Format the name
+          const firstName = item['First Name']?.trim() || '';
+          const lastName = item['Last Name']?.trim() || '';
+          const fullName = [firstName, lastName].filter(Boolean).join(' ');
+          
+          return {
+            id: index + 1,
+            position_ID: item['Item'] || 'No Position',
+            volunteer_name: fullName || 'No Name',
+            volunteer_email: item['Email'] || 'No Email',
+            start_date: startDate || 'No Date',
+            start_datetime: startTime || 'No Time',
+            end_datetime: endTime || 'No Time',
+            arrived: ''
+          };
+        });
+        
+        // Log the parsed data to help with debugging
+        console.log('Parsed CSV data:', structuredData);
+        
+        setData(structuredData);
+      },
+      error: (error) => {
+        console.error('Error parsing CSV:', error);
+        alert('Error parsing CSV file. Please make sure it\'s a valid SignUpGenius export.');
+      }
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          <div className="flex items-center justify-center mb-8">
+            <FileSpreadsheet className="h-8 w-8 text-indigo-600 mr-2" />
+            <h1 className="text-3xl font-bold text-gray-900">
+              SignUpGenius CSV Viewer
+            </h1>
+          </div>
+          
+          <div className="flex flex-col items-center space-y-8">
+            <FileUpload onFileUpload={handleFileUpload} />
+            
+            {data.length > 0 && (
+              <div className="w-full bg-white shadow rounded-lg overflow-hidden">
+                <div className="px-4 py-5 sm:p-6">
+                  <h2 className="text-lg font-medium text-gray-900 mb-4">
+                    Structured Sign-up Data ({data.length} entries)
+                  </h2>
+                  <DataTable data={data} />
+                  <SaveToSupabase data={data} />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
