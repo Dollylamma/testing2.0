@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 245, 245, 245;
+}
+
+.dark {
+  --foreground-rgb: 255, 255, 255;
+  --background-rgb: 30, 30, 30;
+  color-scheme: dark;
+}
+
+@layer base {
+  body {
+    color: rgb(var(--foreground-rgb));
+    background-color: rgb(var(--background-rgb));
+  }
+}
+
+.dark .bg-white {
+  background-color: rgb(50, 50, 50);
+  color: rgb(229, 229, 229);
+}
+
+.dark .text-gray-700 {
+  color: rgb(209, 213, 219);
+}
+
+.dark .text-gray-600 {
+  color: rgb(209, 213, 219);
+}
+
+.dark .text-gray-500 {
+  color: rgb(156, 163, 175);
+}
+
+.dark .border-gray-200 {
+  border-color: rgb(75, 85, 99);
+}
+
+.dark .shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.dark .bg-gray-100 {
+  background-color: rgb(40, 40, 40);
+}
+
+.dark .bg-gray-50 {
+  background-color: rgb(55, 55, 55);
+}
+
+.dark input, 
+.dark select, 
+.dark textarea {
+  background-color: rgb(55, 55, 55);
+  color: rgb(229, 229, 229);
+  border-color: rgb(75, 85, 99);
+}
+
+.dark input::placeholder, 
+.dark textarea::placeholder {
+  color: rgb(156, 163, 175);
+}
+
+/* Font size preferences */
+.font-size-small {
+  font-size: 0.875rem;
+}
+
+.font-size-medium {
+  font-size: 1rem;
+}
+
+.font-size-large {
+  font-size: 1.125rem;
+}
